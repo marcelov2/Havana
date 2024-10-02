@@ -26,6 +26,7 @@ services:
     environment:
       <<: *havana-variables
     restart: on-failure
+
   havana-web:
     depends_on: 
       mariadb:
@@ -42,6 +43,7 @@ services:
     environment:
       <<: *havana-variables
     restart: on-failure
+
   mariadb:
     image: "mariadb:latest"
     ports:
@@ -61,8 +63,22 @@ services:
       retries: 3
     restart: on-failure
 
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8081:80"  # Mapeia a porta 8081 do host para a porta 80 do container
+    networks:
+      - havana
+    environment:
+      PMA_HOST: mariadb  # Nome do serviço do MariaDB
+      PMA_USER: havana    # Usuário do MariaDB
+      PMA_PASSWORD: goldfish # Senha do MariaDB
+      PHP_MAX_UPLOAD_SIZE: 64M  # Aumenta o tamanho máximo de upload para 64MB
+      PHP_POST_MAX_SIZE: 64M      # Aumenta o tamanho máximo para POST para 64MB
+    restart: on-failure
+
 volumes:
-  data:
+  data: # Certifique-se de remover este volume antes de reinstalar
 
 networks:
   havana:
